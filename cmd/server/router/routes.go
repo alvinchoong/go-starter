@@ -5,6 +5,10 @@ import (
 	"net/http"
 	"time"
 
+	"go-starter/internal/models"
+
+	"github.com/alvinchoong/go-httphandler"
+	"github.com/alvinchoong/go-httphandler/plainresp"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -25,14 +29,16 @@ func Handler(
 	r.Use(middleware.Timeout(timeout))
 	r.Use(corsMiddleware([]string{"*"}))
 
-	r.Get("/ping", pingHandler)
+	q := models.New()
+
+	// Post CRUD api
+	NewPostHandler(db, q).Mount(r)
+
+	r.Get("/ping", httphandler.Handle(pingHandler))
 
 	return r, nil
 }
 
-func pingHandler(w http.ResponseWriter, r *http.Request) {
-	_, err := w.Write([]byte("pong"))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+func pingHandler(_ *http.Request) httphandler.Responder {
+	return plainresp.Success("pong")
 }
