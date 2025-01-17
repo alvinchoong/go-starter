@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -16,6 +17,13 @@ func Handler(
 	timeout time.Duration,
 ) (*chi.Mux, error) {
 	r := chi.NewRouter()
+
+	// Top-level middlewares
+	r.Use(middleware.RequestID)
+	r.Use(requestLogger)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.Timeout(timeout))
+	r.Use(corsMiddleware([]string{"*"}))
 
 	r.Get("/ping", pingHandler)
 

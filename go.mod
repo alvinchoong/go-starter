@@ -3,7 +3,9 @@ module go-starter
 go 1.23.2
 
 require (
+	github.com/go-chi/chi v1.5.5
 	github.com/go-chi/chi/v5 v5.2.0
+	github.com/go-chi/cors v1.2.1
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/sync v0.10.0
