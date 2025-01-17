@@ -10,6 +10,14 @@ up:
 down:
 	docker-compose down
 
+migrate:
+	which migrate || go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+	@while ! pg_isready -q -d $(DATABASE_URL); do \
+		echo "Waiting for PostgreSQL to be available..."; \
+		sleep 1; \
+	done
+	migrate -path ./database/migrations -database "$(DATABASE_URL)?sslmode=disable" up
+
 db-console:
 	psql $(DATABASE_URL)
 
