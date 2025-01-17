@@ -1,0 +1,36 @@
+{
+  // unnecessary diffs
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  // gopls: language server
+  "go.useLanguageServer": true,
+  "gopls": {
+    // use gofumpt
+    "formatting.gofumpt": true
+  },
+  // editor related
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "[go][go.mod]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  // test related
+  "go.testFlags": ["-v", "-shuffle=on", "-race"],
+  "go.testEnvFile": "${workspaceFolder}/.env",
+  // lint related
+  "go.lintTool": "golangci-lint",
+  "go.lintFlags": ["--fix"],
+  // editor related
+  "go.coverOnSave": true,
+  "go.coverOnSingleTest": true,
+  "go.coverOnSingleTestFile": true,
+  "yaml.customTags": [
+    "!reference sequence" // https://stackoverflow.com/a/73694179
+  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always",
+    "source.organizeImports": "always"
+  }
+}

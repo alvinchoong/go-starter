@@ -1,0 +1,157 @@
+# https://golangci-lint.run/usage/configuration/
+linters:
+  enable-all: true
+  disable:
+    # - asasalint
+    # - asciicheck
+    # - bidichk
+    # - bodyclose
+    - canonicalheader # Golang always sets the string to canonical headers https://pkg.go.dev/net/http#Header.Set
+    # - containedctx
+    # - contextcheck
+    # - copyloopvar
+    - cyclop
+    # - decorder
+    - depguard
+    # - dogsled
+    - dupl
+    # - dupword
+    # - durationcheck
+    # - err113
+    # - errcheck
+    # - errchkjson
+    # - errname
+    # - errorlint
+    # - execinquery
+    # - exhaustive
+    # - exhaustruct
+    # - exportloopref
+    # - fatcontext
+    # - forbidigo
+    # - forcetypeassert
+    - funlen
+    # - gci
+    # - ginkgolinter
+    # - gocheckcompilerdirectives
+    - gochecknoglobals
+    # - gochecknoinits
+    # - gochecksumtype
+    - gocognit
+    # - goconst
+    # - gocritic
+    # - gocyclo
+    - godot
+    - godox
+    # - gofmt
+    - gofumpt
+    # - goheader
+    - goimports
+    - gomnd
+    # - gomoddirectives
+    # - gomodguard
+    # - goprintffuncname
+    # - gosec
+    # - gosimple
+    # - gosmopolitan
+    # - govet
+    # - grouper
+    # - importas
+    # - inamedparam
+    # - ineffassign
+    # - interfacebloat
+    # - intrange
+    - ireturn
+    - lll
+    # - loggercheck
+    # - maintidx
+    # - makezero
+    # - mirror
+    # - misspell
+    - mnd
+    # - musttag
+    # - nakedret
+    # - nestif
+    # - nilerr
+    # - nilnil
+    - nlreturn
+    # - noctx
+    # - nolintlint
+    # - nonamedreturns
+    # - nosprintfhostport
+    # - paralleltest
+    # - perfsprint
+    # - prealloc
+    # - predeclared
+    # - promlinter
+    # - protogetter
+    # - reassign
+    # - revive
+    # - rowserrcheck
+    # - sloglint
+    # - spancheck
+    # - sqlclosecheck
+    # - staticcheck
+    # - stylecheck
+    # - tagalign
+    - tagliatelle
+    # - tenv
+    # - testableexamples
+    # - testifylint
+    # - testpackage
+    # - thelper
+    # - tparallel
+    # - unconvert
+    # - unparam
+    # - unused
+    # - usestdlibvars
+    - varnamelen
+    # - wastedassign
+    # - whitespace
+    # - wrapcheck
+    - wsl
+    # - zerologlint
+
+issues:
+  fix: true
+  exclude-rules:
+    # Exclude some linters from running on tests files.
+    - path: _test\.go
+      linters:
+        - exhaustruct
+        - paralleltest
+        - dupl
+        - wrapcheck
+        - forcetypeassert
+        - gosec
+        - maintidx
+        - nilerr
+        - err113
+        - contextcheck
+
+linters-settings:
+  revive:
+    rules:
+      - name: context-as-argument
+        severity: warning
+        disabled: false
+        arguments:
+          - allowTypesBefore: "*testing.T,testing.TB"
+  gci:
+    # Section configuration to compare against.
+    # Section names are case-insensitive and may contain parameters in ().
+    # The default order of sections is `standard > default > custom > blank > dot > alias > localmodule`,
+    # If `custom-order` is `true`, it follows the order of `sections` option.
+    # Default: ["standard", "default"]
+    custom-order: true
+    sections:
+      - standard # Standard section: captures all standard packages.
+      - localmodule # Local module section: contains all local packages. This section is not present unless explicitly enabled.
+      - default # Default section: contains all imports that could not be matched to another section type.
+      - blank # Blank section: contains all blank imports. This section is not present unless explicitly enabled.
+      - dot # Dot section: contains all dot imports. This section is not present unless explicitly enabled.
+      - alias # Alias section: contains all alias imports. This section is not present unless explicitly enabled.
+    skip-generated: true
+
+  gomoddirectives:
+    replace-allow-list:
+      - github.com/awslabs/aws-lambda-go-api-proxy
