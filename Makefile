@@ -25,6 +25,9 @@ sqlc:
 	sqlc version | grep v1.27.0 || go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.27.0
 	sqlc generate
 
+test:
+	go test -v -race ./...
+
 server-build:
 	go build -o build/server cmd/server/main.go
 

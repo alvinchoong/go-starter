@@ -15,13 +15,13 @@ import (
 
 type postHandler struct {
 	db      models.DBTX
-	queries *models.Queries
+	querier models.Querier
 }
 
-func NewPostHandler(db models.DBTX, q *models.Queries) *postHandler {
+func NewPostHandler(db models.DBTX, q models.Querier) *postHandler {
 	return &postHandler{
 		db:      db,
-		queries: q,
+		querier: q,
 	}
 }
 
@@ -41,7 +41,7 @@ type CreatePostParams struct {
 func (h *postHandler) Create(r *http.Request, params CreatePostParams) httphandler.Responder {
 	ctx := r.Context()
 
-	post, err := h.queries.CreatePost(ctx, h.db, models.CreatePostParams{
+	post, err := h.querier.CreatePost(ctx, h.db, models.CreatePostParams{
 		ID:          uuid.New(),
 		Title:       params.Title,
 		Description: &params.Description,
@@ -56,7 +56,7 @@ func (h *postHandler) Create(r *http.Request, params CreatePostParams) httphandl
 func (h *postHandler) List(r *http.Request) httphandler.Responder {
 	ctx := r.Context()
 
-	posts, err := h.queries.ListPosts(ctx, h.db)
+	posts, err := h.querier.ListPosts(ctx, h.db)
 	if err != nil {
 		return jsonresp.InternalServerError(err)
 	}
@@ -71,7 +71,7 @@ func (h *postHandler) Get(r *http.Request) httphandler.Responder {
 		return jsonresp.Error(err, "Invalid ID format", http.StatusBadRequest)
 	}
 
-	post, err := h.queries.GetPost(ctx, h.db, id)
+	post, err := h.querier.GetPost(ctx, h.db, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return jsonresp.Error(err, "Post not found", http.StatusNotFound)
@@ -91,7 +91,7 @@ func (h *postHandler) Update(r *http.Request, input models.UpdatePostParams) htt
 	}
 
 	input.ID = id
-	post, err := h.queries.UpdatePost(ctx, h.db, input)
+	post, err := h.querier.UpdatePost(ctx, h.db, input)
 	if err != nil {
 		return jsonresp.InternalServerError(err)
 	}
@@ -107,7 +107,7 @@ func (h *postHandler) Delete(r *http.Request) httphandler.Responder {
 		return jsonresp.Error(err, "Invalid ID format", http.StatusBadRequest)
 	}
 
-	rows, err := h.queries.DeletePost(ctx, h.db, id)
+	rows, err := h.querier.DeletePost(ctx, h.db, id)
 	if err != nil {
 		return jsonresp.InternalServerError(err)
 	}
