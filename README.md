@@ -30,6 +30,7 @@ Go Starter is a ready-to-use repo with modern tooling and best practices. It pro
 │   └── queries/      # SQL queries for sqlc
 ├── docs/             # Documentation
 ├── tools/            # Development tools
+├── vendor/           # Vendored dependencies
 └── build/            # Build artifacts
 ```
 
