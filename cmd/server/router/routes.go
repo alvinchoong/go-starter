@@ -31,8 +31,11 @@ func Handler(
 
 	q := models.New()
 
-	// Post CRUD api
+	// Post CRUD API
 	NewPostHandler(db, q).Mount(r)
+
+	// User API
+	NewUserHandler(newHTTPClient(), "https://jsonplaceholder.typicode.com/users").Mount(r)
 
 	r.Get("/ping", httphandler.Handle(pingHandler))
 
@@ -41,4 +44,24 @@ func Handler(
 
 func pingHandler(_ *http.Request) httphandler.Responder {
 	return plainresp.Success("pong")
+}
+
+// newHTTPClient returns a new HTTP client
+// by default it is configured
+// - with a 15-second timeout to prevent requests from hanging indefinitely
+// - not follow redirects automatically to prevent redirect-related attacks
+func newHTTPClient(opts ...func(*http.Client)) *http.Client {
+	c := &http.Client{
+		Transport: http.DefaultTransport,
+		CheckRedirect: func(*http.Request, []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+		Jar:     nil,
+		Timeout: 15 * time.Second,
+	}
+	for _, o := range opts {
+		o(c)
+	}
+
+	return c
 }
