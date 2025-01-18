@@ -37,6 +37,12 @@ server-build:
 		-X $(BUILDINFO_PKG).BuildTime=$(BUILD_TIME)" \
 		cmd/server/main.go
 
+server-docker-build:
+	docker buildx build \
+		--platform=linux/arm64 \
+		-t go-starter:server \
+		-f cmd/server/Dockerfile .
+
 server-run:
 	go run cmd/server/main.go
 
