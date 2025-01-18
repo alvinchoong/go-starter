@@ -44,9 +44,6 @@ server-docker-build:
 		-f cmd/server/Dockerfile .
 
 server-run:
-	go run cmd/server/main.go
-
-server-dev:
 	which air || go install github.com/cosmtrek/air@latest
 	air --build.delay=1000 \
 		--build.cmd "make server-build" \
