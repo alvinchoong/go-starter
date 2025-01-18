@@ -28,8 +28,14 @@ sqlc:
 test:
 	go test -v -race ./...
 
+GIT_VERSION ?= $(shell git describe --tags)
+BUILD_TIME ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+BUILDINFO_PKG=go-starter/internal/pkg/buildinfo
 server-build:
-	go build -o build/server cmd/server/main.go
+	go build -o build/server -trimpath \
+		-ldflags "-X $(BUILDINFO_PKG).Version=$(GIT_VERSION) \
+		-X $(BUILDINFO_PKG).BuildTime=$(BUILD_TIME)" \
+		cmd/server/main.go
 
 server-run:
 	go run cmd/server/main.go

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"go-starter/cmd/server/router"
+	"go-starter/internal/pkg/buildinfo"
 	"go-starter/internal/pkg/db"
 	"go-starter/internal/pkg/envvar"
 	"go-starter/internal/pkg/slogr"
@@ -37,7 +38,10 @@ func errmain(ctx context.Context) error {
 
 	// Create and set logger with build info in context
 	slogr.SetDefaultJSON(flags.logLevel)
-	logger := slog.Default()
+	logger := slog.Default().With(
+		slog.String("version", buildinfo.Version),
+		slog.String("build-time", buildinfo.BuildTime),
+	)
 	ctx = slogr.ToContext(ctx, logger)
 
 	// connect to DB
