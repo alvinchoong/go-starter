@@ -9,11 +9,13 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+// userHandler implements a proxy to an external user API service
 type userHandler struct {
-	client   *http.Client
-	endpoint string
+	client   *http.Client // HTTP client for external API requests
+	endpoint string       // Base URL of the external API
 }
 
+// NewUserHandler creates a new user handler with configured HTTP client and API endpoint
 func NewUserHandler(client *http.Client, endpoint string) *userHandler {
 	return &userHandler{
 		client:   client,
@@ -21,10 +23,12 @@ func NewUserHandler(client *http.Client, endpoint string) *userHandler {
 	}
 }
 
+// Mount registers user-related routes
 func (h *userHandler) Mount(r chi.Router) {
 	r.Get("/api/v1/users", httphandler.Handle(h.Get))
 }
 
+// User represents the structure of user data from the external API
 type User struct {
 	ID       int     `json:"id"`
 	Name     string  `json:"name"`
@@ -35,6 +39,7 @@ type User struct {
 	Website  string  `json:"website"`
 }
 
+// Address represents the structure of a user's physical address
 type Address struct {
 	Street  string `json:"street"`
 	Suite   string `json:"suite"`
@@ -42,6 +47,7 @@ type Address struct {
 	Zipcode string `json:"zipcode"`
 }
 
+// Get proxies the request to an external API and returns the user data
 func (h *userHandler) Get(r *http.Request) httphandler.Responder {
 	ctx := r.Context()
 

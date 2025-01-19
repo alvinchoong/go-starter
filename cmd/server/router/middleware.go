@@ -11,16 +11,16 @@ import (
 	"github.com/go-chi/cors"
 )
 
-// corsMiddleware configures and returns a CORS (Cross-Origin Resource Sharing) middleware handler
+// corsMiddleware configures and returns a CORS (Cross-Origin Resource Sharing) middleware handler.
 func corsMiddleware(allowedOrigins []string) func(next http.Handler) http.Handler {
 	cors := cors.New(cors.Options{
-		AllowedOrigins:     allowedOrigins, // Dynamic allowed origins
+		AllowedOrigins:     allowedOrigins,
 		AllowOriginFunc:    nil,
 		AllowedMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:     []string{"Link"},
-		AllowCredentials:   false, // Set to true if cookies or auth headers are needed across origins
-		MaxAge:             300,   // Maximum value not ignored by any of major browsers
+		AllowCredentials:   false,
+		MaxAge:             300,
 		OptionsPassthrough: false,
 		Debug:              false,
 	})
@@ -28,9 +28,15 @@ func corsMiddleware(allowedOrigins []string) func(next http.Handler) http.Handle
 	return cors.Handler
 }
 
-// requestLogger serves as a middleware that logs the start and end of each HTTP request
-// It captures useful data such as the request path, method, user-agent, request ID,
-// response status code, and the duration of the request.
+// requestLogger creates a middleware that logs HTTP request details:
+//   - Request path and method
+//   - Request ID for tracing
+//   - User agent
+//   - Response status code
+//   - Request duration
+//
+// It uses structured logging via slog to ensure consistent log format
+// and adds the logger to the request context for use by handlers.
 func requestLogger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()

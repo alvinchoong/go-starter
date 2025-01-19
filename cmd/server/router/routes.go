@@ -14,7 +14,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// Handler returns the http handler that handles all requests
+// Handler returns the http handler that handles all requests.
+// It sets up the router with middleware, database connection, and routes.
 func Handler(
 	ctx context.Context,
 	db *pgxpool.Pool,
@@ -31,25 +32,25 @@ func Handler(
 
 	q := models.New()
 
-	// Post CRUD API
-	NewPostHandler(db, q).Mount(r)
+	// Mount API routes
+	NewPostHandler(db, q).Mount(r)                                                         // Internal Post CRUD API
+	NewUserHandler(newHTTPClient(), "https://jsonplaceholder.typicode.com/users").Mount(r) // External Users API proxy
 
-	// User API
-	NewUserHandler(newHTTPClient(), "https://jsonplaceholder.typicode.com/users").Mount(r)
-
+	// Health check endpoint
 	r.Get("/ping", httphandler.Handle(pingHandler))
 
 	return r, nil
 }
 
+// pingHandler responds to health check requests with "pong"
 func pingHandler(_ *http.Request) httphandler.Responder {
 	return plainresp.Success("pong")
 }
 
 // newHTTPClient returns a new HTTP client
-// by default it is configured
-// - with a 15-second timeout to prevent requests from hanging indefinitely
-// - not follow redirects automatically to prevent redirect-related attacks
+// default configuration:
+// - 15-second timeout to prevent hanging requests
+// - Disabled automatic redirects to prevent redirect-based attacks
 func newHTTPClient(opts ...func(*http.Client)) *http.Client {
 	c := &http.Client{
 		Transport: http.DefaultTransport,

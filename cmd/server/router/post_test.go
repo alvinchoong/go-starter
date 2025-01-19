@@ -260,7 +260,7 @@ func Test_PostHandler_Update(t *testing.T) {
 		desc       string
 		given      string
 		mockFunc   func(*mockQuerier)
-		input      models.UpdatePostParams
+		input      router.UpdatePostParams
 		wantStatus int
 		wantBody   string
 	}{
@@ -280,7 +280,7 @@ func Test_PostHandler_Update(t *testing.T) {
 					UpdatedAt:   fixedTime,
 				}, nil)
 			},
-			input: models.UpdatePostParams{
+			input: router.UpdatePostParams{
 				Title:       "Updated title",
 				Description: ptr.Ref("Updated description"),
 			},
@@ -291,7 +291,7 @@ func Test_PostHandler_Update(t *testing.T) {
 			desc:       "invalid uuid",
 			given:      "invalid-uuid",
 			mockFunc:   func(m *mockQuerier) {},
-			input:      models.UpdatePostParams{},
+			input:      router.UpdatePostParams{},
 			wantStatus: http.StatusBadRequest,
 			wantBody:   `{"error":"Invalid ID format"}`,
 		},
@@ -302,7 +302,7 @@ func Test_PostHandler_Update(t *testing.T) {
 				m.On("UpdatePost", mock.Anything, mock.Anything, mock.Anything).
 					Return(models.Post{}, errors.New("db error"))
 			},
-			input:      models.UpdatePostParams{},
+			input:      router.UpdatePostParams{},
 			wantStatus: http.StatusInternalServerError,
 			wantBody:   `{"error":"Internal Server Error"}`,
 		},
