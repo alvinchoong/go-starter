@@ -10,13 +10,19 @@ up:
 down:
 	docker-compose down
 
+# migrate target supports:
+# make migrate (applies all pending migrations)
+# make migrate CMD=up STEP=1 (applies 1 pending migrations)
+# make migrate CMD=down STEP=2 (rolls back 2 migrations)
+migrate: CMD=up
+migrate: STEP=
 migrate:
 	which migrate || go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 	@while ! pg_isready -q -d $(DATABASE_URL); do \
 		echo "Waiting for PostgreSQL to be available..."; \
 		sleep 1; \
 	done
-	migrate -path ./database/migrations -database "$(DATABASE_URL)?sslmode=disable" up
+	migrate -path ./database/migrations -database "$(DATABASE_URL)?sslmode=disable" $(CMD) $(STEP)
 
 db-console:
 	psql $(DATABASE_URL)
