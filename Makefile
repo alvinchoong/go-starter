@@ -4,6 +4,14 @@ SHELL = /bin/bash -u -e -o pipefail
 include .env
 export
 
+git-prepush-install:
+	@echo "#!/bin/sh" > .git/hooks/pre-push
+	@echo "make git-prepush" >> .git/hooks/pre-push
+	@chmod +x .git/hooks/pre-push
+	@echo "Git pre-push hook set up to run 'make git-prepush'"
+
+git-prepush: lint
+
 up:
 	docker-compose up -d --remove-orphans
 

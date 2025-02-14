@@ -92,6 +92,7 @@ To use this template for your project:
 - `make server-run`: Run server with live reload
 - `make server-build`: Build server binary
 - `make server-docker-build`: Build server Docker image
+- `make git-prepush-install`: Install git pre-push hook to run checks
 
 ## References
 
