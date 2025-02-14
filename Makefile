@@ -4,6 +4,14 @@ SHELL = /bin/bash -u -e -o pipefail
 include .env
 export
 
+git-prepush-install:
+	@echo "#!/bin/sh" > .git/hooks/pre-push
+	@echo "make git-prepush" >> .git/hooks/pre-push
+	@chmod +x .git/hooks/pre-push
+	@echo "Git pre-push hook set up to run 'make git-prepush'"
+
+git-prepush: lint
+
 up:
 	docker-compose up -d --remove-orphans
 
@@ -28,13 +36,13 @@ db-console:
 	psql $(DATABASE_URL)
 
 sqlc:
-	sqlc version | grep v1.27.0 || go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.27.0
+	sqlc version | grep v1.28.0 || go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.28.0
 	sqlc generate
 
 test:
 	go test -v -race ./...
 
-GIT_VERSION ?= $(shell git describe --tags)
+GIT_VERSION ?= $(shell git describe --tags --always)
 BUILD_TIME ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 BUILDINFO_PKG=go-starter/internal/pkg/buildinfo
 server-build:
@@ -50,7 +58,7 @@ server-docker-build:
 		-f cmd/server/Dockerfile .
 
 server-run:
-	which air || go install github.com/cosmtrek/air@latest
+	which air || go install github.com/air-verse/air@latest
 	air --build.delay=1000 \
 		--build.cmd "make server-build" \
 		--build.bin "./build/server" \
@@ -66,5 +74,5 @@ lint:
 	fi
 	gofumpt -version | grep v0.7.0 || go install mvdan.cc/gofumpt@v0.7.0
 	gofumpt -w cmd internal tools
-	golangci-lint --version | grep 1.61.0 || wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.61.0
+	golangci-lint --version | grep 1.64.5 || wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.64.5
 	golangci-lint run --verbose  --max-issues-per-linter 0 --max-same-issues 0 --fix

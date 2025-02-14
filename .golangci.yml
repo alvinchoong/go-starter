@@ -46,7 +46,6 @@ linters:
     - gofumpt
     # - goheader
     - goimports
-    - gomnd
     # - gomoddirectives
     # - gomodguard
     # - goprintffuncname
@@ -127,6 +126,11 @@ issues:
         - nilerr
         - err113
         - contextcheck
+    # Exclude some linters from running pkg meant for testing
+    - path: internal/mocks/*
+      linters:
+        - wrapcheck
+        - forcetypeassert
 
 linters-settings:
   revive:

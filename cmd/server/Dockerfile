@@ -1,5 +1,5 @@
 # Build stage
-FROM --platform=$BUILDPLATFORM golang:1.23.2 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.24.0 AS builder
 
 WORKDIR /app
 

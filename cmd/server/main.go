@@ -64,10 +64,10 @@ func run(ctx context.Context) error {
 	server := &http.Server{
 		Addr:                         config.serverAddr,
 		Handler:                      handler,
-		ReadHeaderTimeout:            10 * time.Second,
 		DisableGeneralOptionsHandler: false,
 		TLSConfig:                    nil,
 		ReadTimeout:                  config.serverReadTimeout,
+		ReadHeaderTimeout:            10 * time.Second,
 		WriteTimeout:                 config.serverWriteTimeout,
 		IdleTimeout:                  config.serverIdleTimeout,
 		MaxHeaderBytes:               0,
@@ -76,6 +76,8 @@ func run(ctx context.Context) error {
 		ErrorLog:                     nil,
 		BaseContext:                  nil,
 		ConnContext:                  nil,
+		HTTP2:                        nil,
+		Protocols:                    nil,
 	}
 
 	// Start server and handle graceful shutdown
