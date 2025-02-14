@@ -24,6 +24,7 @@ Go Starter is a ready-to-use repo with modern tooling and best practices. It pro
 │   └── server/       # HTTP server implementation
 ├── internal/         # Private application code
 │   ├── models/       # Generated database models
+│   ├── mocks/        # Mock implementations for testing
 │   └── pkg/          # Shared internal packages
 ├── database/         # Database related files
 │   ├── migrations/   # SQL migrations

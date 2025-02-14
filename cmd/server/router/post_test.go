@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"go-starter/cmd/server/router"
+	"go-starter/internal/mocks"
 	"go-starter/internal/models"
 	"go-starter/internal/pkg/ptr"
 
@@ -30,13 +31,13 @@ func Test_PostHandler_Create(t *testing.T) {
 
 	testCases := []struct {
 		desc       string
-		mockFunc   func(*mockQuerier)
+		mockFunc   func(*mocks.Querier)
 		wantStatus int
 		wantBody   string
 	}{
 		{
 			desc: "success",
-			mockFunc: func(m *mockQuerier) {
+			mockFunc: func(m *mocks.Querier) {
 				m.On("CreatePost", mock.Anything, mock.Anything, mock.Anything).
 					Return(models.Post{
 						ID:          fixedUUID,
@@ -51,7 +52,7 @@ func Test_PostHandler_Create(t *testing.T) {
 		},
 		{
 			desc: "fail",
-			mockFunc: func(m *mockQuerier) {
+			mockFunc: func(m *mocks.Querier) {
 				m.On("CreatePost", mock.Anything, mock.Anything, mock.Anything).
 					Return(models.Post{}, errors.New("db error"))
 			},
@@ -65,7 +66,7 @@ func Test_PostHandler_Create(t *testing.T) {
 			t.Parallel()
 
 			// Given:
-			mockQ := &mockQuerier{}
+			mockQ := &mocks.Querier{}
 			tc.mockFunc(mockQ)
 			h := router.NewPostHandler(nil, mockQ)
 			r := httptest.NewRequest(http.MethodPost, "/api/v1/posts", nil)
@@ -97,13 +98,13 @@ func Test_PostHandler_List(t *testing.T) {
 
 	testCases := []struct {
 		desc       string
-		mockFunc   func(*mockQuerier)
+		mockFunc   func(*mocks.Querier)
 		wantStatus int
 		wantBody   string
 	}{
 		{
 			desc: "success | one result",
-			mockFunc: func(m *mockQuerier) {
+			mockFunc: func(m *mocks.Querier) {
 				m.On("ListPosts", mock.Anything, mock.Anything).
 					Return([]models.Post{{
 						ID:          fixedUUID,
@@ -118,7 +119,7 @@ func Test_PostHandler_List(t *testing.T) {
 		},
 		{
 			desc: "success | no results",
-			mockFunc: func(m *mockQuerier) {
+			mockFunc: func(m *mocks.Querier) {
 				m.On("ListPosts", mock.Anything, mock.Anything).
 					Return([]models.Post{}, nil)
 			},
@@ -127,7 +128,7 @@ func Test_PostHandler_List(t *testing.T) {
 		},
 		{
 			desc: "fail",
-			mockFunc: func(m *mockQuerier) {
+			mockFunc: func(m *mocks.Querier) {
 				m.On("ListPosts", mock.Anything, mock.Anything).
 					Return([]models.Post{}, errors.New("db error"))
 			},
@@ -141,7 +142,7 @@ func Test_PostHandler_List(t *testing.T) {
 			t.Parallel()
 
 			// Given:
-			mockQ := &mockQuerier{}
+			mockQ := &mocks.Querier{}
 			tc.mockFunc(mockQ)
 			h := router.NewPostHandler(nil, mockQ)
 			r := httptest.NewRequest(http.MethodGet, "/api/v1/posts", nil)
@@ -171,14 +172,14 @@ func Test_PostHandler_Get(t *testing.T) {
 	testCases := []struct {
 		desc       string
 		given      string
-		mockFunc   func(*mockQuerier)
+		mockFunc   func(*mocks.Querier)
 		wantStatus int
 		wantBody   string
 	}{
 		{
 			desc:  "success",
 			given: fixedUUID.String(),
-			mockFunc: func(m *mockQuerier) {
+			mockFunc: func(m *mocks.Querier) {
 				m.On("GetPost", mock.Anything, mock.Anything, fixedUUID).
 					Return(models.Post{
 						ID:          fixedUUID,
@@ -193,7 +194,7 @@ func Test_PostHandler_Get(t *testing.T) {
 		},
 		{
 			desc: "not found",
-			mockFunc: func(m *mockQuerier) {
+			mockFunc: func(m *mocks.Querier) {
 				m.On("GetPost", mock.Anything, mock.Anything, fixedUUID).
 					Return(models.Post{}, pgx.ErrNoRows)
 			},
@@ -203,14 +204,14 @@ func Test_PostHandler_Get(t *testing.T) {
 		},
 		{
 			desc:       "invalid uuid",
-			mockFunc:   func(m *mockQuerier) {},
+			mockFunc:   func(m *mocks.Querier) {},
 			given:      "invalid-uuid",
 			wantStatus: http.StatusBadRequest,
 			wantBody:   `{"error":"Invalid ID format"}`,
 		},
 		{
 			desc: "db error",
-			mockFunc: func(m *mockQuerier) {
+			mockFunc: func(m *mocks.Querier) {
 				m.On("GetPost", mock.Anything, mock.Anything, fixedUUID).
 					Return(models.Post{}, errors.New("db error"))
 			},
@@ -225,7 +226,7 @@ func Test_PostHandler_Get(t *testing.T) {
 			t.Parallel()
 
 			// Given:
-			mockQ := &mockQuerier{}
+			mockQ := &mocks.Querier{}
 			tc.mockFunc(mockQ)
 			h := router.NewPostHandler(nil, mockQ)
 			r := httptest.NewRequest(http.MethodGet, "/api/v1/posts/"+tc.given, nil)
@@ -259,7 +260,7 @@ func Test_PostHandler_Update(t *testing.T) {
 	testCases := []struct {
 		desc       string
 		given      string
-		mockFunc   func(*mockQuerier)
+		mockFunc   func(*mocks.Querier)
 		input      router.UpdatePostParams
 		wantStatus int
 		wantBody   string
@@ -267,7 +268,7 @@ func Test_PostHandler_Update(t *testing.T) {
 		{
 			desc:  "success",
 			given: fixedUUID.String(),
-			mockFunc: func(m *mockQuerier) {
+			mockFunc: func(m *mocks.Querier) {
 				m.On("UpdatePost", mock.Anything, mock.Anything, models.UpdatePostParams{
 					ID:          fixedUUID,
 					Title:       "Updated title",
@@ -290,7 +291,7 @@ func Test_PostHandler_Update(t *testing.T) {
 		{
 			desc:       "invalid uuid",
 			given:      "invalid-uuid",
-			mockFunc:   func(m *mockQuerier) {},
+			mockFunc:   func(m *mocks.Querier) {},
 			input:      router.UpdatePostParams{},
 			wantStatus: http.StatusBadRequest,
 			wantBody:   `{"error":"Invalid ID format"}`,
@@ -298,7 +299,7 @@ func Test_PostHandler_Update(t *testing.T) {
 		{
 			desc:  "db error",
 			given: fixedUUID.String(),
-			mockFunc: func(m *mockQuerier) {
+			mockFunc: func(m *mocks.Querier) {
 				m.On("UpdatePost", mock.Anything, mock.Anything, mock.Anything).
 					Return(models.Post{}, errors.New("db error"))
 			},
@@ -313,7 +314,7 @@ func Test_PostHandler_Update(t *testing.T) {
 			t.Parallel()
 
 			// Given:
-			mockQ := &mockQuerier{}
+			mockQ := &mocks.Querier{}
 			tc.mockFunc(mockQ)
 			h := router.NewPostHandler(nil, mockQ)
 			r := httptest.NewRequest(http.MethodPut, "/api/v1/posts/"+tc.given, nil)
@@ -346,14 +347,14 @@ func Test_PostHandler_Delete(t *testing.T) {
 	testCases := []struct {
 		desc       string
 		given      string
-		mockFunc   func(*mockQuerier)
+		mockFunc   func(*mocks.Querier)
 		wantStatus int
 		wantBody   string
 	}{
 		{
 			desc:  "success",
 			given: fixedUUID.String(),
-			mockFunc: func(m *mockQuerier) {
+			mockFunc: func(m *mocks.Querier) {
 				m.On("DeletePost", mock.Anything, mock.Anything, fixedUUID).
 					Return(int64(1), nil)
 			},
@@ -363,7 +364,7 @@ func Test_PostHandler_Delete(t *testing.T) {
 		{
 			desc:  "not found",
 			given: fixedUUID.String(),
-			mockFunc: func(m *mockQuerier) {
+			mockFunc: func(m *mocks.Querier) {
 				m.On("DeletePost", mock.Anything, mock.Anything, fixedUUID).
 					Return(int64(0), nil)
 			},
@@ -373,13 +374,13 @@ func Test_PostHandler_Delete(t *testing.T) {
 		{
 			desc:       "invalid uuid",
 			given:      "invalid-uuid",
-			mockFunc:   func(m *mockQuerier) {},
+			mockFunc:   func(m *mocks.Querier) {},
 			wantStatus: http.StatusBadRequest,
 			wantBody:   `{"error":"Invalid ID format"}`,
 		},
 		{
 			desc: "fail",
-			mockFunc: func(m *mockQuerier) {
+			mockFunc: func(m *mocks.Querier) {
 				m.On("DeletePost", mock.Anything, mock.Anything, fixedUUID).
 					Return(int64(0), errors.New("db error"))
 			},
@@ -394,7 +395,7 @@ func Test_PostHandler_Delete(t *testing.T) {
 			t.Parallel()
 
 			// Given:
-			mockQ := &mockQuerier{}
+			mockQ := &mocks.Querier{}
 			tc.mockFunc(mockQ)
 			h := router.NewPostHandler(nil, mockQ)
 			r := httptest.NewRequest(http.MethodDelete, "/api/v1/posts/"+tc.given, nil)
@@ -420,34 +421,4 @@ func Test_PostHandler_Delete(t *testing.T) {
 			assert.Equal(t, tc.wantBody, strings.TrimSpace(string(gotBodyBytes)))
 		})
 	}
-}
-
-type mockQuerier struct {
-	mock.Mock
-	models.Querier
-}
-
-func (m *mockQuerier) CreatePost(ctx context.Context, db models.DBTX, params models.CreatePostParams) (models.Post, error) {
-	args := m.Called(ctx, db, params)
-	return args.Get(0).(models.Post), args.Error(1)
-}
-
-func (m *mockQuerier) ListPosts(ctx context.Context, db models.DBTX) ([]models.Post, error) {
-	args := m.Called(ctx, db)
-	return args.Get(0).([]models.Post), args.Error(1)
-}
-
-func (m *mockQuerier) GetPost(ctx context.Context, db models.DBTX, id uuid.UUID) (models.Post, error) {
-	args := m.Called(ctx, db, id)
-	return args.Get(0).(models.Post), args.Error(1)
-}
-
-func (m *mockQuerier) UpdatePost(ctx context.Context, db models.DBTX, params models.UpdatePostParams) (models.Post, error) {
-	args := m.Called(ctx, db, params)
-	return args.Get(0).(models.Post), args.Error(1)
-}
-
-func (m *mockQuerier) DeletePost(ctx context.Context, db models.DBTX, id uuid.UUID) (int64, error) {
-	args := m.Called(ctx, db, id)
-	return args.Get(0).(int64), args.Error(1)
 }
