@@ -11,7 +11,8 @@ Go Starter is a ready-to-use repo with modern tooling and best practices. It pro
   - [jackc/pgx](https://github.com/jackc/pgx) - PostgreSQL driver and toolkit with advanced features and performance
   - [sqlc](https://github.com/sqlc-dev/sqlc) - Type-safe SQL code generation
   - [golang-migrate](https://github.com/golang-migrate/migrate) - Database migrations
-- **Testing**: [stretchr/testify](https://github.com/stretchr/testify) - Toolkit with common assertions and mocks
+- **Testing**:
+  - [stretchr/testify](https://github.com/stretchr/testify) - Toolkit with common assertions and mocks
 - **Development**:
   - [golangci-lint](https://github.com/golangci/golangci-lint) - Fast Go linters runner
   - [air](https://github.com/cosmtrek/air) - Live reload for Go apps
@@ -37,7 +38,7 @@ Go Starter is a ready-to-use repo with modern tooling and best practices. It pro
 
 ## Prerequisites
 
-- [Go 1.23](https://go.dev/doc/go1.23) or later
+- [Go 1.24](https://go.dev/dl/) or later
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
