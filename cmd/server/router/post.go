@@ -27,15 +27,6 @@ func NewPostHandler(db models.DBTX, q models.Querier) *postHandler {
 	}
 }
 
-// Mount registers all post-related routes
-func (h *postHandler) Mount(r chi.Router) {
-	r.Post("/api/v1/posts", httphandler.HandleWithInput(h.Create))
-	r.Get("/api/v1/posts", httphandler.Handle(h.List))
-	r.Get("/api/v1/posts/{id}", httphandler.Handle(h.Get))
-	r.Put("/api/v1/posts/{id}", httphandler.HandleWithInput(h.Update))
-	r.Delete("/api/v1/posts/{id}", httphandler.Handle(h.Delete))
-}
-
 // CreatePostParams defines the required fields for creating a new post
 type CreatePostParams struct {
 	Title       string `json:"title"`

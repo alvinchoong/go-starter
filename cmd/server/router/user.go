@@ -6,7 +6,6 @@ import (
 
 	"github.com/alvinchoong/go-httphandler"
 	"github.com/alvinchoong/go-httphandler/jsonresp"
-	"github.com/go-chi/chi/v5"
 )
 
 // userHandler implements a proxy to an external user API service
@@ -21,11 +20,6 @@ func NewUserHandler(client *http.Client, endpoint string) *userHandler {
 		client:   client,
 		endpoint: endpoint,
 	}
-}
-
-// Mount registers user-related routes
-func (h *userHandler) Mount(r chi.Router) {
-	r.Get("/api/v1/users", httphandler.Handle(h.Get))
 }
 
 // User represents the structure of user data from the external API
