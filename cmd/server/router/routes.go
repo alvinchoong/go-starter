@@ -41,9 +41,9 @@ func Handler(
 	r.Put("/api/v1/posts/{id}", httphandler.HandleWithInput(ph.Update))
 	r.Delete("/api/v1/posts/{id}", httphandler.Handle(ph.Delete))
 
-	// External Users API proxy
-	uh := NewUserHandler(newHTTPClient(), "https://jsonplaceholder.typicode.com/users")
-	r.Get("/api/v1/users", httphandler.Handle(uh.Get))
+	// Quotes API proxy
+	qh := NewQuoteHandler(newHTTPClient(), "https://dummyjson.com/quotes/random")
+	r.Get("/api/v1/quotes", httphandler.Handle(qh.Get))
 
 	// Health check endpoint
 	r.Get("/ping", httphandler.Handle(pingHandler))
