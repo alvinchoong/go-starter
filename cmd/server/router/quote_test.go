@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_UserHandler_Get(t *testing.T) {
+func Test_QuoteHandler_Get(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -26,24 +26,15 @@ func Test_UserHandler_Get(t *testing.T) {
 			mockResponse: func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
-				_, err := w.Write([]byte(`[{
+				_, err := w.Write([]byte(`{
 					"id": 1,
-					"name": "Test User",
-					"username": "testuser",
-					"email": "test@example.com",
-					"address": {
-						"street": "Test St",
-						"suite": "Apt 1",
-						"city": "Test City",
-						"zipcode": "12345"
-					},
-					"phone": "1-234-567-8900",
-					"website": "test.com"
-				}]`))
+					"quote": "Life is what happens when you're busy making other plans",
+					"author": "John Lennon"
+				}`))
 				assert.NoError(t, err)
 			},
 			wantStatus: http.StatusOK,
-			wantBody:   `[{"id":1,"name":"Test User","username":"testuser","email":"test@example.com","address":{"street":"Test St","suite":"Apt 1","city":"Test City","zipcode":"12345"},"phone":"1-234-567-8900","website":"test.com"}]`,
+			wantBody:   `{"id":1,"quote":"Life is what happens when you're busy making other plans","author":"John Lennon"}`,
 		},
 		{
 			desc: "external api returns error",
@@ -78,8 +69,8 @@ func Test_UserHandler_Get(t *testing.T) {
 			mockServer := httptest.NewServer(tc.mockResponse)
 			defer mockServer.Close()
 
-			h := router.NewUserHandler(&http.Client{}, mockServer.URL)
-			r := httptest.NewRequest(http.MethodGet, "/api/v1/users", nil)
+			h := router.NewQuoteHandler(&http.Client{}, mockServer.URL)
+			r := httptest.NewRequest(http.MethodGet, "/api/v1/quotes", nil)
 			w := httptest.NewRecorder()
 
 			// When:

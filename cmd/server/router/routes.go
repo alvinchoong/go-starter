@@ -30,11 +30,20 @@ func Handler(
 	r.Use(middleware.Timeout(timeout))
 	r.Use(corsMiddleware([]string{"*"}))
 
+	// Initialize database query interface
 	q := models.New()
 
-	// Mount API routes
-	NewPostHandler(db, q).Mount(r)                                                         // Internal Post CRUD API
-	NewUserHandler(newHTTPClient(), "https://jsonplaceholder.typicode.com/users").Mount(r) // External Users API proxy
+	// Post CRUD API
+	ph := NewPostHandler(db, q)
+	r.Post("/api/v1/posts", httphandler.HandleWithInput(ph.Create))
+	r.Get("/api/v1/posts", httphandler.Handle(ph.List))
+	r.Get("/api/v1/posts/{id}", httphandler.Handle(ph.Get))
+	r.Put("/api/v1/posts/{id}", httphandler.HandleWithInput(ph.Update))
+	r.Delete("/api/v1/posts/{id}", httphandler.Handle(ph.Delete))
+
+	// Quotes API proxy
+	qh := NewQuoteHandler(newHTTPClient(), "https://dummyjson.com/quotes/random")
+	r.Get("/api/v1/quotes", httphandler.Handle(qh.Get))
 
 	// Health check endpoint
 	r.Get("/ping", httphandler.Handle(pingHandler))
