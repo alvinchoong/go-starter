@@ -38,7 +38,9 @@ func Test_PostHandler_Create(t *testing.T) {
 		{
 			desc: "success",
 			mockFunc: func(m *mocks.Querier) {
-				m.On("CreatePost", mock.Anything, mock.Anything, mock.Anything).
+				m.On("CreatePost", mock.Anything, mock.Anything, mock.MatchedBy(func(p models.CreatePostParams) bool {
+					return p.Title == "Post title" && ptr.SameValue(p.Description, ptr.Ref("Post description"))
+				})).
 					Return(models.Post{
 						ID:          fixedUUID,
 						Title:       "Post title",
