@@ -89,12 +89,14 @@ To use this template for your project:
 - `make up`: Start PostgreSQL database with Docker Compose
 - `make down`: Stop and remove Docker Compose services
 - `make migrate`: Run database migrations
+- `make db-console`: Start terminal-based PostgreSQL interface
 - `make sqlc`: Generate type-safe SQL code
 - `make test`: Run tests with race detection
 - `make server-run`: Run server with live reload
 - `make server-build`: Build server binary
 - `make server-docker-build`: Build server Docker image
 - `make git-prepush-install`: Install git pre-push hook to run checks
+- `make lint`: Run code formatting and linting checks
 
 ## References
 
