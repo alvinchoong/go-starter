@@ -9,8 +9,8 @@ import (
 
 	"github.com/alvinchoong/go-httphandler"
 	"github.com/alvinchoong/go-httphandler/plainresp"
-	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
