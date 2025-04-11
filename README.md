@@ -98,6 +98,19 @@ To use this template for your project:
 - `make git-prepush-install`: Install git pre-push hook to run checks
 - `make lint`: Run code formatting and linting checks
 
+## CI/CD Pipeline
+
+This repository includes a CI pipeline using GitHub Actions to automate testing and building processes.
+
+### CI Pipeline (Continuous Integration)
+
+The CI pipeline runs automatically on pull requests and pushes to the main branch:
+
+1. **Linting**: Ensures code quality using golangci-lint with the project's configuration
+2. **Testing**: Runs all tests with race detection against a PostgreSQL test database
+3. **Building**: Compiles the application and creates build artifacts
+4. **Docker**: Builds Docker images (without pushing)
+
 ## References
 
 - [Effective Go](https://golang.org/doc/effective_go)
