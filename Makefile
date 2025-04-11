@@ -66,13 +66,12 @@ server-run:
 		--build.exclude_dir "vendor" \
 		--build.exclude_regex ".*_test.go"
 
+lint: VERSION=2.0.2
 lint:
 	go mod tidy
 	if ! git diff --quiet go.mod go.sum; then \
 		printf "$(RED)There are changes to the go.mod & go.sum files$(NORMAL)\n"; \
 		exit 1; \
 	fi
-	gofumpt -version | grep v0.7.0 || go install mvdan.cc/gofumpt@v0.7.0
-	gofumpt -w cmd internal tools
-	golangci-lint --version | grep 1.64.5 || wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.64.5
+	golangci-lint --version | grep $(VERSION) || wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin $(VERSION)
 	golangci-lint run --verbose  --max-issues-per-linter 0 --max-same-issues 0 --fix
