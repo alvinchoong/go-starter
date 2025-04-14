@@ -1,0 +1,137 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  GO_VERSION: "1.24"
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: v2.0.2
+          args: --verbose --max-issues-per-linter 0 --max-same-issues 0
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: go_starter_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Run migrations and tests
+        run: |
+          make migrate DATABASE_URL=$DATABASE_URL
+          make test
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/go_starter_test
+          DATABASE_CONNS: 10
+          SERVER_ADDR: :8080
+          SERVER_READ_TIMEOUT: 5s
+          SERVER_WRITE_TIMEOUT: 10s
+          SERVER_IDLE_TIMEOUT: 120s
+          LOG_LEVEL: DEBUG
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Build binary
+        run: make server-build
+        env:
+          GOARCH: arm64
+          GOOS: linux
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-binary
+          path: build/server
+          retention-days: 7
+
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: build
+    # if: github.event_name == 'push' && (github.ref == 'refs/heads/main')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: cmd/server/Dockerfile
+          push: false
+          platforms: linux/arm64
+          tags: go-starter:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+# Docker image publishing options:
+# 1. For GitHub Container Registry (ghcr.io):
+#    - Add login step: docker/login-action@v3 with registry: ghcr.io
+#    - Set push: true in build-push-action
+#    - Use image name: ghcr.io/${{ github.repository }}/server
+#
+# 2. For AWS ECR:
+#    - Add login step: aws-actions/amazon-ecr-login@v2
+#    - Set push: true in build-push-action
+#    - Use image name: ${{ steps.login-ecr.outputs.registry }}/your-repo-name
+#
+# 3. For Docker Hub:
+#    - Add login step: docker/login-action@v3 with username and password
+#    - Set push: true in build-push-action
+#    - Use image name: username/repo-name
